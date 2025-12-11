@@ -3,20 +3,19 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Company, createCompany, buyShares as buySharesFn, updateSharePrice, getOwnershipPercentage, isBuyoutThreshold, executeBuyout, calculatePortfolioValue } from '../economy/companies';
+import { Company, createCompany, buyShares as buySharesFn, updateSharePrice, getOwnershipPercentage, executeBuyout } from '../economy/companies';
 import { MarketState, createInitialMarketState, updateMarketPrices, cleanExpiredManipulations, getPrice, updateSupplyDemand } from '../economy/markets';
-import { Asset, AssetType, createAsset as createAssetHelper, getBuildCost, getUpgradeCost, getUpkeepCost, getProductionPerTick, calculateAssetProfit, ASSET_DEFINITIONS } from '../economy/assets';
+import { Asset, AssetType, createAsset as createAssetHelper, getBuildCost, getUpgradeCost, getUpkeepCost, getProductionPerTick, ASSET_DEFINITIONS } from '../economy/assets';
 import { ResourceType, getAllResourceTypes } from '../economy/resources';
-import { BigEvent, createBigEvent, MAJOR_EVENT_TEMPLATES } from '../events/eventTypes';
-import { EventEngineState, createEventEngine, updateEventEngine, shouldTriggerEvent, triggerRandomEvent, getMostSevereEvent } from '../events/eventEngine';
-import { NewsFeedState, createNewsFeed, addNewsItem, ensureNewsfeedNotEmpty, generateCrisisNews, generatePlayerActionNews, generateAIActionNews, generateTakeoverNews, generateMarketShiftNews } from '../news/newsFeed';
-import { GovernmentState, createGovernmentState, updateLobbyingInfluence, getEffectiveTaxRate, startInvestigation } from '../politics/governmentStore';
-import { MediaState, createMediaState, getCompanyMediaInfluence, frameEvent } from '../media/mediaStore';
+import { BigEvent } from '../events/eventTypes';
+import { EventEngineState, createEventEngine, updateEventEngine, shouldTriggerEvent, triggerRandomEvent } from '../events/eventEngine';
+import { NewsFeedState, createNewsFeed, addNewsItem, ensureNewsfeedNotEmpty, generateCrisisNews, generatePlayerActionNews, generateAIActionNews, generateTakeoverNews } from '../news/newsFeed';
+import { GovernmentState, createGovernmentState, getEffectiveTaxRate, startInvestigation } from '../politics/governmentStore';
+import { MediaState, createMediaState, frameEvent } from '../media/mediaStore';
 import { PeopleState, createPeopleState, updateSentiment, updateRetailInvestors, getSentimentReputationImpact } from '../people/peopleStore';
-import { calculateNCP, rankCompaniesByNCP, CompanyRanking } from '../economy/scoring';
+import { rankCompaniesByNCP, CompanyRanking } from '../economy/scoring';
 import { industries } from '../data/industries';
-import { randomChoice, randomInt } from '../utils/random';
-import { AIPersonality, createEnhancedAICompany } from '../ai/competitors';
+import { randomChoice } from '../utils/random';
 import { decideAIAction, executeAIDecision } from '../ai/aiAssetLogic';
 
 const SEASON_DURATION_MS = 20 * 60 * 1000; // 20 minutes for testing (can be adjusted)
@@ -75,7 +74,7 @@ interface WorldStore {
   seasonResults: { rankings: CompanyRanking[] } | null;
   
   // Game loop
-  gameLoopInterval: NodeJS.Timeout | null;
+  gameLoopInterval: ReturnType<typeof setInterval> | null;
   gameStarted: boolean; // Whether the game has been started
 
   // Offworld-style loop state
@@ -121,6 +120,24 @@ interface WorldStore {
   // Event handling
   respondToEventChoice: (eventId: string, choiceId: string) => void;
   dismissBreakingEvent: () => void;
+  
+  // Computed properties - these should be computed by components from companies/playerCompanyId
+  // But we include them here for backward compatibility with existing code
+  player: Company | null;
+  aiCompanies: Company[];
+  systems: any; // SystemsState from systemsStore
+  tradeOffers: any[];
+  alliances: any[];
+  world: any;
+  
+  // Additional methods
+  tradeResource: (resourceType: ResourceType, amount: number, targetCompanyId?: string) => boolean;
+  respondToCrisis: (eventId: string, choiceId: string) => void;
+  formAlliance: (targetCompanyId: string) => boolean;
+  leaveAlliance: (allianceId: string) => boolean;
+  upgradeDepartment: (departmentId: string) => boolean;
+  buyResource: (resourceType: ResourceType, amount: number) => boolean;
+  updateSystems: () => void;
 }
 
 export const useWorldStore = create<WorldStore>()(
@@ -155,7 +172,7 @@ export const useWorldStore = create<WorldStore>()(
 
       initializeWorld: (options = {}) => {
         console.log('[worldStore] initializeWorld called with options:', options);
-        const { industry = 'tech', difficulty = 'medium', playerName = 'Player' } = options;
+        const { industry = 'tech', playerName = 'Player' } = options;
         
         // Everyone starts with the same capital (100K base)
         const startingCash = 100000;
@@ -165,13 +182,11 @@ export const useWorldStore = create<WorldStore>()(
         
         // Create AI companies - all start with same capital
         const aiCompanies: Company[] = [];
-        const aiPersonalities: AIPersonality[] = ['visionary', 'baron', 'shark', 'politico', 'ghost', 'opportunist'];
         const industryIds = industries.map(ind => ind.id);
         console.log('[worldStore] Creating AI companies, industryIds:', industryIds);
         
         for (let i = 0; i < 5; i++) {
           const aiIndustry = randomChoice(industryIds);
-          const aiPersonality = aiPersonalities[i % aiPersonalities.length];
           const aiName = `Corp ${String.fromCharCode(65 + i)}`;
           
           const aiCompany = createCompany(
@@ -242,6 +257,19 @@ export const useWorldStore = create<WorldStore>()(
           maxActionPoints: MAX_ACTION_POINTS,
           distressedCompanies: [],
           companyDistressTicks: {},
+          // Computed properties
+          player: playerCompany,
+          aiCompanies: aiCompanies,
+          systems: {
+            market: createInitialMarketState(),
+            eventEngine,
+            newsFeed: createNewsFeed(100),
+            lastUpdate: now,
+            updateInterval: 5000,
+          },
+          tradeOffers: [],
+          alliances: [],
+          world: {} as any,
         };
         
         console.log('[worldStore] Setting state with', newState.companies.length, 'companies');
@@ -317,7 +345,7 @@ export const useWorldStore = create<WorldStore>()(
         });
       },
 
-      tick: (deltaMs: number) => {
+      tick: (_deltaMs: number) => {
         const state = get();
         if (state.seasonEnded) return;
 
@@ -682,7 +710,7 @@ export const useWorldStore = create<WorldStore>()(
             // AI company goes bankrupt (removed from game)
             updatedNewsFeed = addNewsItem(updatedNewsFeed, {
               id: `news-bankruptcy-${Date.now()}`,
-              category: 'corporate',
+              category: 'headline',
               title: `${company.name} declares bankruptcy`,
               content: `${company.name} has been unable to recover from financial distress and has declared bankruptcy.`,
               timestamp: now,
@@ -1191,7 +1219,7 @@ export const useWorldStore = create<WorldStore>()(
             // Change asset owner
             return {
               ...asset,
-              id: asset.id.replace(targetCompany.id, state.playerCompanyId), // New ID for player
+              id: asset.id.replace(targetCompany.id, state.playerCompanyId || 'player'), // New ID for player
             };
           }
           return asset;
@@ -1204,7 +1232,7 @@ export const useWorldStore = create<WorldStore>()(
             return {
               ...c,
               cash: c.cash - buyoutCost + targetCompany.cash,
-              assets: [...c.assets, ...targetCompany.assets.map(aid => aid.replace(targetCompany.id, state.playerCompanyId))],
+              assets: [...c.assets, ...targetCompany.assets.map(aid => aid.replace(targetCompany.id, state.playerCompanyId || 'player'))],
             };
           }
           if (c.id === targetCompanyId) {
@@ -1282,6 +1310,56 @@ export const useWorldStore = create<WorldStore>()(
           isBreakingEventActive: false,
         });
       },
+      
+      // Computed properties - these are computed on access via getters in interface
+      // Implementation: return null/empty initially, components compute from state
+      player: null as Company | null,
+      aiCompanies: [] as Company[],
+      systems: {
+        market: createInitialMarketState(),
+        eventEngine: createEventEngine(),
+        newsFeed: createNewsFeed(50),
+        lastUpdate: Date.now(),
+        updateInterval: 5000,
+      } as any,
+      tradeOffers: [] as any[],
+      alliances: [] as any[],
+      world: {} as any,
+      
+      // Stub methods for missing functionality
+      tradeResource: () => {
+        console.warn('tradeResource not implemented yet');
+        return false;
+      },
+      
+      respondToCrisis: (eventId: string, choiceId: string) => {
+        get().respondToEventChoice(eventId, choiceId);
+      },
+      
+      formAlliance: () => {
+        console.warn('formAlliance not implemented yet');
+        return false;
+      },
+      
+      leaveAlliance: () => {
+        console.warn('leaveAlliance not implemented yet');
+        return false;
+      },
+      
+      upgradeDepartment: () => {
+        console.warn('upgradeDepartment not implemented yet');
+        return false;
+      },
+      
+      buyResource: () => {
+        console.warn('buyResource not implemented yet');
+        return false;
+      },
+      
+      updateSystems: () => {
+        // Stub - systems are updated in the game loop
+        console.warn('updateSystems should be called from game loop');
+      },
     }),
     {
       name: 'oligarchy-world-storage',
@@ -1289,5 +1367,38 @@ export const useWorldStore = create<WorldStore>()(
   )
 );
 
+// Create a wrapper hook that adds computed properties
+const useMmoStoreWithComputed = () => {
+  const store = useWorldStore();
+  const playerCompanyId = store.playerCompanyId;
+  const companies = store.companies;
+  
+  // Compute player
+  const player = playerCompanyId 
+    ? companies.find(c => c.id === playerCompanyId) || null
+    : null;
+  
+  // Compute AI companies
+  const aiCompanies = companies.filter(c => !c.isPlayer);
+  
+  // Compute systems
+  const systems = {
+    market: store.marketState,
+    eventEngine: store.eventEngine,
+    newsFeed: store.newsFeed,
+  };
+  
+  return {
+    ...store,
+    player,
+    aiCompanies,
+    systems,
+    tradeOffers: [],
+    alliances: [],
+    world: store,
+  };
+};
+
 // Export alias for backward compatibility with existing code
 export { useWorldStore as useMmoStore };
+export { useMmoStoreWithComputed };

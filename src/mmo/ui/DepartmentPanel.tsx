@@ -5,7 +5,8 @@ import { getDepartmentUpgradeCost } from '../operations/departments';
 import { DepartmentType } from '../operations/departments';
 
 const DepartmentPanel = () => {
-  const { player, upgradeDepartment } = useMmoStore();
+  const { playerCompanyId, companies, upgradeDepartment } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
 
   if (!player) return null;
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { GameState, PlayerProfile, Account, Investment, MarketCycleData, Difficulty, AgeTrack, YearEvent } from '../types/game';
+import { GameState, PlayerProfile, Account, Difficulty, AgeTrack, YearEvent } from '../types/game';
 import { getMarketCycle, getRandomReturn } from '../data/marketCycles';
 import { getEventsForAge } from '../data/events';
 import { professions } from '../data/professions';

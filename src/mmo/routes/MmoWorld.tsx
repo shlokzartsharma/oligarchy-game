@@ -387,7 +387,7 @@ const MmoWorld = () => {
               <div className="flex gap-4">
                 <button
                   onClick={() => {
-                    const { buyShares, tradeResource } = useWorldStore.getState();
+                    const { buyShares } = useWorldStore.getState();
                     if (showTradeModal.type === 'shares') {
                       buyShares(showTradeModal.companyId, tradeAmount);
                     } else {

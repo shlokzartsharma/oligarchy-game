@@ -1,9 +1,11 @@
 // Company Dashboard: Overview of company stats, assets, departments
 import { motion } from 'framer-motion';
 import { useMmoStore } from '../state/worldStore';
+import { ASSET_DEFINITIONS } from '../economy/assets';
 
 const CompanyDashboard = () => {
-  const { player, assets } = useMmoStore();
+  const { playerCompanyId, companies, assets } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
 
   if (!player) return null;
 
@@ -61,7 +63,7 @@ const CompanyDashboard = () => {
               .filter(a => player.assets.includes(a.id))
               .map(asset => (
                 <div key={asset.id} className="p-3 bg-navy/5 rounded-lg">
-                  <div className="font-semibold text-navy">{asset.name}</div>
+                  <div className="font-semibold text-navy">{ASSET_DEFINITIONS[asset.type]?.name || asset.type}</div>
                   <div className="text-sm text-navy/70">Level {asset.level}</div>
                 </div>
               ))
@@ -81,7 +83,7 @@ const CompanyDashboard = () => {
           {Object.entries(player.departments).map(([dept, level]) => (
             <div key={dept} className="p-3 bg-navy/5 rounded-lg text-center">
               <div className="font-semibold text-navy capitalize">{dept}</div>
-              <div className="text-2xl font-bold text-gold">{level}</div>
+              <div className="text-2xl font-bold text-gold">{level as number}</div>
             </div>
           ))}
         </div>
@@ -104,7 +106,7 @@ const CompanyDashboard = () => {
             Object.entries(player.rawResources).map(([type, amount]) => (
               <div key={type} className="p-3 bg-navy/5 rounded-lg">
                 <div className="font-semibold text-navy capitalize">{type.replace('_', ' ')}</div>
-                <div className="text-lg font-bold text-navy">{amount.toLocaleString()}</div>
+                <div className="text-lg font-bold text-navy">{(amount as number).toLocaleString()}</div>
               </div>
             ))
           )}

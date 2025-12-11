@@ -18,12 +18,14 @@ interface SabotageActionCardProps {
 }
 
 const SabotageActionCard = ({ targetName, targetId, optionA, optionB }: SabotageActionCardProps) => {
-  const { player, world } = useMmoStore();
+  const { playerCompanyId, companies } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
+  const world = useMmoStore.getState();
   const canAffordA = player ? player.capital >= optionA.cost : false;
   const canAffordB = player ? player.capital >= optionB.cost : false;
   
   // Check cooldown
-  const lastSabotage = world.sabotageCooldowns[targetId] || 0;
+  const lastSabotage = (world as any).sabotageCooldowns?.[targetId] || 0;
   const cooldownActive = Date.now() - lastSabotage < 60000;
   const cooldownRemaining = Math.ceil((60000 - (Date.now() - lastSabotage)) / 1000);
 

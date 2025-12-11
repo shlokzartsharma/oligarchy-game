@@ -109,3 +109,10 @@ export const getOligarchs = (
   return rankings.slice(0, topN);
 };
 
+// Export CompanyRanking type
+export type CompanyRanking = {
+  company: Company;
+  ncp: NCPBreakdown;
+  rank: number;
+};
+

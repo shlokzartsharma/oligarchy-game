@@ -4,10 +4,11 @@ import { motion } from 'framer-motion';
 import { useMmoStore } from '../state/worldStore';
 
 const AllianceDashboard = () => {
-  const { player, alliances, formAlliance, leaveAlliance } = useMmoStore();
+  const { playerCompanyId, companies, alliances, formAlliance, leaveAlliance } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
   const [allianceName, setAllianceName] = useState('');
   const currentAlliance = player?.allianceId 
-    ? alliances.find(a => a.id === player.allianceId)
+    ? (alliances as any[]).find((a: any) => a.id === player.allianceId)
     : null;
 
   if (!player) return null;
@@ -33,7 +34,7 @@ const AllianceDashboard = () => {
           <div className="mb-4">
             <div className="text-navy/70 mb-2">Members ({currentAlliance.members.length})</div>
             <div className="space-y-2">
-              {currentAlliance.members.map(member => (
+              {(currentAlliance.members as any[]).map((member: any) => (
                 <div key={member.id} className="flex items-center justify-between p-2 bg-navy/5 rounded">
                   <div>
                     <span className="font-semibold text-navy">{member.name}</span>
@@ -98,13 +99,13 @@ const AllianceDashboard = () => {
         className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-navy/10"
       >
         <h3 className="text-xl font-bold text-navy mb-4">Available Alliances</h3>
-        {alliances.filter(a => a.id !== player.allianceId).length === 0 ? (
+        {(alliances as any[]).filter((a: any) => a.id !== player.allianceId).length === 0 ? (
           <div className="text-navy/50 text-center py-4">No other alliances</div>
         ) : (
           <div className="space-y-2">
-            {alliances
-              .filter(a => a.id !== player.allianceId)
-              .map(alliance => (
+            {(alliances as any[])
+              .filter((a: any) => a.id !== player.allianceId)
+              .map((alliance: any) => (
                 <div key={alliance.id} className="p-3 bg-navy/5 rounded">
                   <div className="font-semibold text-navy">{alliance.name}</div>
                   <div className="text-sm text-navy/70">

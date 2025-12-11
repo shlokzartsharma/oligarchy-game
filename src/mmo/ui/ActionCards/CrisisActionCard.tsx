@@ -19,7 +19,8 @@ interface CrisisActionCardProps {
 }
 
 const CrisisActionCard = ({ eventTitle, eventDescription, eventId, optionA, optionB }: CrisisActionCardProps) => {
-  const { player, respondToCrisis } = useMmoStore();
+  const { playerCompanyId, companies, respondToCrisis } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
   const canAffordA = player ? player.capital >= optionA.cost : false;
   const canAffordB = player ? player.capital >= optionB.cost : false;
 

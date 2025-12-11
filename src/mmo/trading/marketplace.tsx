@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useMmoStore } from '../state/worldStore';
 import { ResourceType, RESOURCES } from '../economy/resources';
-import { createTradeOffer } from './tradingEngine';
+// import { createTradeOffer } from './tradingEngine'; // Unused for now
 
 const Marketplace = () => {
-  const { player, tradeOffers, aiCompanies } = useMmoStore();
+  const { playerCompanyId, companies, tradeOffers } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
+  const aiCompanies = companies.filter(c => !c.isPlayer);
   const [selectedResource, setSelectedResource] = useState<ResourceType | null>(null);
   const [offerAmount, setOfferAmount] = useState(0);
   const [requestAmount, setRequestAmount] = useState(0);
@@ -86,7 +88,7 @@ const Marketplace = () => {
           <div className="text-navy/50 text-center py-4">No active offers</div>
         ) : (
           <div className="space-y-2">
-            {tradeOffers.map(offer => (
+            {(tradeOffers as any[]).map((offer: any) => (
               <div key={offer.id} className="p-3 bg-navy/5 rounded">
                 <div className="font-semibold text-navy">
                   {offer.fromName} → {offer.toName}

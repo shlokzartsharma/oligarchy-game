@@ -13,7 +13,7 @@
 
 import { MarketState, createInitialMarketState, updateMarketPrices, cleanExpiredManipulations } from '../economy/markets';
 import { EventEngineState, createEventEngine, updateEventEngine, triggerRandomEvent } from '../events/eventEngine';
-import { NewsFeedState, createNewsFeed } from '../news/newsFeed';
+import { NewsFeedState, createNewsFeed, addNewsItem } from '../news/newsFeed';
 import { ResourceType } from '../economy/resources';
 
 export interface SystemsState {
@@ -52,7 +52,8 @@ export const updateSystems = (
   
   // Check for new events
   if (shouldTriggerEvent(updatedEventEngine)) {
-    updatedEventEngine = triggerRandomEvent(updatedEventEngine, availableTerritories, availableResources);
+    const eventResult = triggerRandomEvent(updatedEventEngine);
+    updatedEventEngine = eventResult.engine;
   }
 
   return {
@@ -82,12 +83,11 @@ export const getMarketPrice = (state: SystemsState, resourceType: ResourceType):
 
 // Get active events
 export const getActiveEvents = (state: SystemsState) => {
-  return state.eventEngine.events.filter(e => Date.now() < e.expiresAt);
+  return state.eventEngine.activeEvents.filter((e: any) => Date.now() < e.expiresAt);
 };
 
 // Add news item
 export const addNews = (state: SystemsState, newsItem: any): SystemsState => {
-  const { addNewsItem } = require('../news/newsFeed');
   return {
     ...state,
     newsFeed: addNewsItem(state.newsFeed, newsItem),

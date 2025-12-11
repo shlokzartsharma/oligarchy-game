@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { useWorldStore } from '../state/worldStore';
-import { Asset, AssetType, ASSET_DEFINITIONS, getBuildCost, getUpgradeCost, calculateAssetProfit } from '../economy/assets';
+import { AssetType, ASSET_DEFINITIONS, getBuildCost, getUpgradeCost, calculateAssetProfit } from '../economy/assets';
 import { ResourceType } from '../economy/resources';
 import { getPrice } from '../economy/markets';
 

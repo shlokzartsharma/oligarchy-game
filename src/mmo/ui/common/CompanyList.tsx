@@ -54,7 +54,7 @@ const CompanyList = ({ companies, playerCompanyId, onSelect, showActions = false
               {showActions && (
                 <div className="mt-2 flex gap-2">
                   <button
-                    onClick={(e) => onSelect && onSelect(company)}
+                    onClick={() => onSelect && onSelect(company)}
                     className="px-4 py-2 bg-gold text-navy text-sm font-semibold rounded-lg hover:shadow-lg"
                   >
                     View Details

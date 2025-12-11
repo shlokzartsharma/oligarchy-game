@@ -8,7 +8,7 @@ import Ollie from '../components/Ollie';
 import { YearEvent } from '../types/game';
 import { soundManager } from '../utils/sounds';
 import { Confetti } from '../utils/confetti';
-import { quizzes } from '../data/quizzes';
+// import { quizzes } from '../data/quizzes'; // Unused
 
 const MainGameScreen = () => {
   const navigate = useNavigate();

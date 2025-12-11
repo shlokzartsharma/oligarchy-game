@@ -18,7 +18,8 @@ interface EconomicActionCardProps {
 }
 
 const EconomicActionCard = ({ title, description, optionA, optionB }: EconomicActionCardProps) => {
-  const { player } = useMmoStore();
+  const { playerCompanyId, companies } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
   const canAffordA = player ? player.capital >= optionA.cost : false;
   const canAffordB = player ? player.capital >= optionB.cost : false;
 
