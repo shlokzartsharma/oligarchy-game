@@ -1,11 +1,11 @@
 // Season End Screen: Rankings, Oligarch status, legacy perks
 
-import { useEffect } from 'react';
+// import { useEffect } from 'react'; // Unused
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useWorldStore } from '../state/worldStore';
 import { rankCompaniesByNCP, getOligarchs } from '../economy/scoring';
-import { Company } from '../economy/companies';
+// import { Company } from '../economy/companies'; // Unused
 
 const MmoSeasonEnd = () => {
   const navigate = useNavigate();

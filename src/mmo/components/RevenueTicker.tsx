@@ -4,7 +4,7 @@ import { useMmoStore } from '../state/worldStore';
 
 const RevenueTicker = () => {
   const { player, tickRevenue } = useMmoStore();
-  const [lastCapital, setLastCapital] = useState(player?.capital || 0);
+  const [lastCapital, setLastCapital] = useState((player?.capital || player?.cash) || 0);
   const [showGain, setShowGain] = useState(false);
   const [gainAmount, setGainAmount] = useState(0);
 
@@ -22,7 +22,7 @@ const RevenueTicker = () => {
   useEffect(() => {
     if (!player) return;
 
-    const currentCapital = player.capital;
+    const currentCapital = player.capital || player.cash;
     const difference = currentCapital - lastCapital;
 
     if (difference > 0) {
@@ -32,7 +32,7 @@ const RevenueTicker = () => {
     }
 
     setLastCapital(currentCapital);
-  }, [player?.capital, lastCapital]);
+  }, [player?.capital || player?.cash, lastCapital]);
 
   if (!player) return null;
 
@@ -42,12 +42,12 @@ const RevenueTicker = () => {
         <h3 className="text-xl font-bold text-navy">Capital</h3>
         <div className="relative">
           <motion.div
-            key={player.capital}
+            key={player.capital || player.cash}
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
             className="text-3xl font-bold text-soft-green"
           >
-            ${player.capital.toLocaleString()}
+            ${(player.capital || player.cash).toLocaleString()}
           </motion.div>
           <AnimatePresence>
             {showGain && (
@@ -78,7 +78,7 @@ const RevenueTicker = () => {
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-navy/70">Power:</span>
-          <span className="font-semibold text-navy">{Math.round(player.power)}</span>
+          <span className="font-semibold text-navy">{Math.round(player.power || 0)}</span>
         </div>
       </div>
     </div>

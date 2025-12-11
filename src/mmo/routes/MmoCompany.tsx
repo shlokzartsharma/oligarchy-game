@@ -68,7 +68,7 @@ const MmoCompany = () => {
               <div className="flex justify-between">
                 <span className="text-navy/70">Capital:</span>
                 <span className="font-bold text-soft-green">
-                  ${player.capital.toLocaleString()}
+                  ${(player.capital || player.cash).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -83,26 +83,26 @@ const MmoCompany = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-navy/70">Power:</span>
-                <span className="font-bold text-navy">{Math.round(player.power)}</span>
+                <span className="font-bold text-navy">{Math.round(player.power || 0)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-navy/70">Season Score:</span>
                 <span className="font-bold text-gold">
-                  {player.seasonScore.toLocaleString()}
+                  {(player.seasonScore || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-navy/70">Brand Reputation:</span>
-                <span className="font-bold text-navy">{player.brandReputation}/100</span>
+                <span className="font-bold text-navy">{(player.brandReputation ?? player.reputation)}/100</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-navy/70">Lobbying Power:</span>
                 <span className="font-bold text-gold">{player.lobbyingPower}</span>
               </div>
-              {player.scandals.length > 0 && (
+              {(player.scandals || []).length > 0 && (
                 <div className="mt-4 pt-4 border-t border-navy/10">
                   <div className="text-navy/70 mb-2">Active Scandals:</div>
-                  <div className="text-red-600 font-semibold">{player.scandals.length}</div>
+                  <div className="text-red-600 font-semibold">{(player.scandals || []).length}</div>
                 </div>
               )}
             </div>
@@ -206,15 +206,15 @@ const MmoCompany = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                if (investInRD()) {
+                if (investInRD(50000)) {
                   // Success feedback could be added here
                 }
               }}
-              disabled={!player || player.capital < 50000}
+              disabled={!player || (player.capital || player.cash) < 50000}
               className={`
                 p-4 rounded-xl border-2 text-left transition-all
                 ${
-                  player && player.capital >= 50000
+                  player && (player.capital || player.cash) >= 50000
                     ? 'border-gold bg-gold/10 hover:shadow-lg cursor-pointer'
                     : 'border-navy/20 bg-navy/5 cursor-not-allowed opacity-50'
                 }
@@ -233,15 +233,15 @@ const MmoCompany = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                if (player && player.capital >= 30000) {
+                if (player && (player.capital || player.cash) >= 30000) {
                   // Launch PR campaign
                 }
               }}
-              disabled={!player || player.capital < 30000}
+              disabled={!player || (player.capital || player.cash) < 30000}
               className={`
                 p-4 rounded-xl border-2 text-left transition-all
                 ${
-                  player && player.capital >= 30000
+                  player && (player.capital || player.cash) >= 30000
                     ? 'border-gold bg-gold/10 hover:shadow-lg cursor-pointer'
                     : 'border-navy/20 bg-navy/5 cursor-not-allowed opacity-50'
                 }

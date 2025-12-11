@@ -151,7 +151,7 @@ export const updateRetailInvestors = (
 export const getSentimentReputationImpact = (
   people: PeopleState,
   companyIndustry: string,
-  companyReputation: number
+  _companyReputation: number
 ): number => {
   let impact = 0;
   

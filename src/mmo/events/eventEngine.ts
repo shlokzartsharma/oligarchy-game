@@ -2,7 +2,7 @@
 // Events cascade across multiple systems (government, media, sentiment, markets)
 
 import { BigEvent, createBigEvent, MAJOR_EVENT_TEMPLATES } from './eventTypes';
-import { randomChoice, randomInt } from '../utils/random';
+import { randomChoice } from '../utils/random';
 
 export interface EventEngineState {
   activeEvents: BigEvent[];

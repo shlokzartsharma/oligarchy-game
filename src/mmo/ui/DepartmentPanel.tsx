@@ -21,9 +21,9 @@ const DepartmentPanel = () => {
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
       {departments.map(dept => {
-        const currentLevel = player.departments[dept.type] || 1;
+        const currentLevel = (player.departments || {})[dept.type] || 1;
         const cost = getDepartmentUpgradeCost(dept.type, currentLevel);
-        const canAfford = player.capital >= cost;
+        const canAfford = (player.capital || player.cash) >= cost;
         const isMaxLevel = currentLevel >= 10;
 
         return (

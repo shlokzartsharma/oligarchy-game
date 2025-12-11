@@ -8,7 +8,7 @@ import { ResourceType, RESOURCES } from '../economy/resources';
 const Marketplace = () => {
   const { playerCompanyId, companies, tradeOffers } = useMmoStore();
   const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
-  const aiCompanies = companies.filter(c => !c.isPlayer);
+  // const aiCompanies = companies.filter(c => !c.isPlayer); // Unused
   const [selectedResource, setSelectedResource] = useState<ResourceType | null>(null);
   const [offerAmount, setOfferAmount] = useState(0);
   const [requestAmount, setRequestAmount] = useState(0);

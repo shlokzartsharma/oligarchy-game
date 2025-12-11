@@ -137,7 +137,7 @@ export const createEnhancedAICompany = (
   personality: AIPersonality,
   baseCapital: number = 50000
 ): EnhancedAICompany => {
-  const personalityProfile = AI_PERSONALITIES[personality];
+  // const personalityProfile = AI_PERSONALITIES[personality]; // Unused
   
   return {
     id,

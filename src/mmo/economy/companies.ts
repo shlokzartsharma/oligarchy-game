@@ -34,14 +34,25 @@ export interface Company {
   
   // Influence & reputation
   reputation: number; // 0-100
+  brandReputation?: number; // Alias for reputation
   lobbyingPower: number;
   mediaInfluence: number;
+  power?: number; // Computed power score
+  seasonScore?: number; // Score for current season
+  
+  // Departments (optional, for UI)
+  departments?: Record<string, number>;
   
   // Territories
   territoriesOwned: string[];
   
   // Alliances
   allianceId?: string;
+  
+  // Additional optional properties
+  scandals?: string[];
+  capital?: number; // Alias for cash (for backward compatibility)
+  rawResources?: Record<string, number>; // Alias for resources
   
   // Status
   isSubsidiary: boolean; // If acquired by another company
@@ -206,7 +217,7 @@ export const isBuyoutThreshold = (company: Company, shareholderId: string): bool
 export const executeBuyout = (
   targetCompany: Company,
   acquirerId: string,
-  acquirerName: string
+  _acquirerName: string
 ): {
   targetCompany: Company;
   payout: number;

@@ -33,7 +33,7 @@ const MmoWorld = () => {
     startGameLoop,
     stopGameLoop,
     respondToEventChoice,
-    dismissBreakingEvent,
+    // dismissBreakingEvent, // Unused
     enterReactionPhase,
   } = useWorldStore();
 
@@ -104,11 +104,11 @@ const MmoWorld = () => {
   });
   
   // Handle start button click
-  const handleStartGame = () => {
-    if (!gameStarted && companies.length > 0) {
-      useWorldStore.setState({ gameStarted: true });
-    }
-  };
+  // const handleStartGame = () => { // Unused
+  //   if (!gameStarted && companies.length > 0) {
+  //     useWorldStore.setState({ gameStarted: true });
+  //   }
+  // };
 
   // Show loading state if world not initialized
   if (!playerCompanyId || companies.length === 0) {

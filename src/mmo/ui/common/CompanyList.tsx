@@ -12,6 +12,8 @@ interface CompanyListProps {
   onSelect?: (company: Company) => void;
   showActions?: boolean;
   distressedCompanies?: string[];
+  playerActionPoints?: number;
+  currentPhase?: string;
 }
 
 const CompanyList = ({ companies, playerCompanyId, onSelect, showActions = false, distressedCompanies = [] }: CompanyListProps) => {

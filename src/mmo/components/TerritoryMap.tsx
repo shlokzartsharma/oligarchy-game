@@ -4,7 +4,9 @@ import { Territory } from '../types';
 import { getTerritoryCost } from '../data/territories';
 
 const TerritoryMap = () => {
-  const { world, player, expandTerritory } = useMmoStore();
+  const { playerCompanyId, companies, expandTerritory } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
+  const world = useMmoStore.getState() as any;
 
   const handleTerritoryClick = (territory: Territory) => {
     if (!player) return;
@@ -26,7 +28,7 @@ const TerritoryMap = () => {
     if (territory.owner === player.id) return 'opacity-100';
     
     const cost = getTerritoryCost(territory);
-    if (player.capital < cost) return 'opacity-50';
+    if ((player.capital || player.cash) < cost) return 'opacity-50';
     
     return 'opacity-100';
   };
@@ -35,9 +37,9 @@ const TerritoryMap = () => {
     <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-navy/10">
       <h3 className="text-2xl font-bold text-navy mb-4">Territory Control</h3>
       <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-        {world.territories.map((territory) => {
+        {(world.territories || []).map((territory: any) => {
           const cost = getTerritoryCost(territory);
-          const canAfford = player ? player.capital >= cost : false;
+          const canAfford = player ? (player.capital || player.cash) >= cost : false;
           const isOwned = territory.owner === player?.id;
 
           return (

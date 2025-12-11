@@ -1,7 +1,7 @@
 // Diplomacy system: Invite, betray, leave alliances
 // Handles alliance interactions and negotiations
 
-import { Alliance, addAllianceMember, removeAllianceMember, updateLoyalty, shouldBetray } from './cartels';
+import { Alliance, addAllianceMember, removeAllianceMember, shouldBetray } from './cartels';
 
 export type DiplomacyAction = 
   | 'invite'

@@ -2,10 +2,10 @@
 // Uses the SAME APIs as the player
 
 import { Company } from '../economy/companies';
-import { Asset, AssetType, getBuildCost, getUpgradeCost, getUpkeepCost, getProductionPerTick, calculateAssetProfit, ASSET_DEFINITIONS } from '../economy/assets';
+import { Asset, AssetType, getBuildCost, getUpgradeCost, calculateAssetProfit, ASSET_DEFINITIONS } from '../economy/assets';
 import { MarketState, getPrice } from '../economy/markets';
 import { ResourceType } from '../economy/resources';
-import { randomChoice, randomFloat } from '../utils/random';
+// import { randomChoice } from '../utils/random'; // Unused
 
 export interface AIDecision {
   action: 'build' | 'upgrade' | 'shutdown' | 'loan' | 'idle';
@@ -20,8 +20,8 @@ export const decideAIAction = (
   aiCompany: Company,
   assets: Asset[],
   marketState: MarketState,
-  distressedCompanies: string[],
-  phase: string
+  _distressedCompanies: string[],
+  _phase: string
 ): AIDecision => {
   const companyAssets = assets.filter(a => aiCompany.assets.includes(a.id));
   const decisions: AIDecision[] = [];

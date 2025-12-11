@@ -3,17 +3,19 @@ import { motion } from 'framer-motion';
 import { useMmoStore } from '../state/worldStore';
 
 const SeasonTimer = () => {
-  const { world, endSeason } = useMmoStore();
+  const { seasonEndTimestamp } = useMmoStore();
   const [timeRemaining, setTimeRemaining] = useState(0);
 
   useEffect(() => {
+    if (!seasonEndTimestamp) return;
+    
     const updateTimer = () => {
       const now = Date.now();
-      const remaining = Math.max(0, world.seasonEndTimestamp - now);
+      const remaining = Math.max(0, seasonEndTimestamp - now);
       setTimeRemaining(remaining);
 
       if (remaining === 0) {
-        endSeason();
+        // Season ended - handled by game loop
       }
     };
 
@@ -21,7 +23,7 @@ const SeasonTimer = () => {
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [world.seasonEndTimestamp, endSeason]);
+  }, [seasonEndTimestamp]);
 
   const formatTime = (ms: number): string => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -30,8 +32,8 @@ const SeasonTimer = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const progress = world.seasonEndTimestamp
-    ? Math.max(0, Math.min(100, ((Date.now() - (world.seasonEndTimestamp - 300000)) / 300000) * 100))
+  const progress = seasonEndTimestamp
+    ? Math.max(0, Math.min(100, ((Date.now() - (seasonEndTimestamp - 300000)) / 300000) * 100))
     : 0;
 
   return (

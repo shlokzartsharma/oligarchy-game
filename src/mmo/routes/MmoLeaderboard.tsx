@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useMmoStore } from '../state/worldStore';
 import { getIndustryById } from '../data/industries';
-import { calculateNCP, rankCompaniesByNCP } from '../economy/scoring';
+import { rankCompaniesByNCP } from '../economy/scoring';
 
 const MmoLeaderboard = () => {
   const navigate = useNavigate();

@@ -128,16 +128,21 @@ interface WorldStore {
   systems: any; // SystemsState from systemsStore
   tradeOffers: any[];
   alliances: any[];
-  world: any;
+  // world: any; // Removed - use get() to access store
   
   // Additional methods
   tradeResource: (resourceType: ResourceType, amount: number, targetCompanyId?: string) => boolean;
   respondToCrisis: (eventId: string, choiceId: string) => void;
-  formAlliance: (targetCompanyId: string) => boolean;
-  leaveAlliance: (allianceId: string) => boolean;
+  formAlliance: (targetCompanyId?: string, allianceName?: string) => boolean;
+  leaveAlliance: (allianceId?: string) => boolean;
   upgradeDepartment: (departmentId: string) => boolean;
   buyResource: (resourceType: ResourceType, amount: number) => boolean;
   updateSystems: () => void;
+  expandTerritory: (territoryId: string) => boolean;
+  undercutCompetitor: (targetCompanyId: string) => boolean;
+  investInRD: (amount: number) => boolean;
+  tickRevenue: () => void;
+  endSeason: () => void;
 }
 
 export const useWorldStore = create<WorldStore>()(
@@ -269,7 +274,7 @@ export const useWorldStore = create<WorldStore>()(
           },
           tradeOffers: [],
           alliances: [],
-          world: {} as any,
+          // world: {} as any, // Removed
         };
         
         console.log('[worldStore] Setting state with', newState.companies.length, 'companies');
@@ -1140,9 +1145,9 @@ export const useWorldStore = create<WorldStore>()(
         return true;
       },
       
-      tradeResource: (targetCompanyId: string, resourceType: ResourceType, quantity: number) => {
+      tradeResource: (resourceType: ResourceType, amount: number, targetCompanyId?: string) => {
         const state = get();
-        if (!state.playerCompanyId) return false;
+        if (!state.playerCompanyId || !targetCompanyId) return false;
         
         // Check action points during reaction phase
         if (state.phase === 'reaction' && !state.spendPlayerActionPoint()) {
@@ -1155,21 +1160,21 @@ export const useWorldStore = create<WorldStore>()(
         if (!playerCompany || !targetCompany) return false;
         
         const playerResourceAmount = playerCompany.resources[resourceType] || 0;
-        if (playerResourceAmount < quantity) return false;
+        if (playerResourceAmount < amount) return false;
         
         const marketPrice = getPrice(state.marketState, resourceType);
-        const tradeValue = marketPrice * quantity;
+        const tradeValue = marketPrice * amount;
         
         // Simple trade: player gives resource, gets cash
         const updatedCompanies = state.companies.map(c => {
           if (c.id === state.playerCompanyId) {
             const updatedResources = { ...c.resources };
-            updatedResources[resourceType] = (updatedResources[resourceType] || 0) - quantity;
+            updatedResources[resourceType] = (updatedResources[resourceType] || 0) - amount;
             return { ...c, resources: updatedResources, cash: c.cash + tradeValue };
           }
           if (c.id === targetCompanyId) {
             const updatedResources = { ...c.resources };
-            updatedResources[resourceType] = (updatedResources[resourceType] || 0) + quantity;
+            updatedResources[resourceType] = (updatedResources[resourceType] || 0) + amount;
             return { ...c, resources: updatedResources, cash: Math.max(0, c.cash - tradeValue) };
           }
           return c;
@@ -1324,24 +1329,21 @@ export const useWorldStore = create<WorldStore>()(
       } as any,
       tradeOffers: [] as any[],
       alliances: [] as any[],
-      world: {} as any,
+      // world property removed - use get() to access store
       
       // Stub methods for missing functionality
-      tradeResource: () => {
-        console.warn('tradeResource not implemented yet');
-        return false;
-      },
+      // tradeResource is implemented above (line ~1148)
       
       respondToCrisis: (eventId: string, choiceId: string) => {
         get().respondToEventChoice(eventId, choiceId);
       },
       
-      formAlliance: () => {
+      formAlliance: (_targetCompanyId?: string, _allianceName?: string) => {
         console.warn('formAlliance not implemented yet');
         return false;
       },
       
-      leaveAlliance: () => {
+      leaveAlliance: (_allianceId?: string) => {
         console.warn('leaveAlliance not implemented yet');
         return false;
       },
@@ -1359,6 +1361,30 @@ export const useWorldStore = create<WorldStore>()(
       updateSystems: () => {
         // Stub - systems are updated in the game loop
         console.warn('updateSystems should be called from game loop');
+      },
+      
+      expandTerritory: () => {
+        console.warn('expandTerritory not implemented yet');
+        return false;
+      },
+      
+      undercutCompetitor: () => {
+        console.warn('undercutCompetitor not implemented yet');
+        return false;
+      },
+      
+      investInRD: () => {
+        console.warn('investInRD not implemented yet');
+        return false;
+      },
+      
+      tickRevenue: () => {
+        // Stub - revenue is calculated in tick
+        console.warn('tickRevenue should be called from tick');
+      },
+      
+      endSeason: () => {
+        console.warn('endSeason not implemented yet');
       },
     }),
     {
@@ -1395,7 +1421,7 @@ const useMmoStoreWithComputed = () => {
     systems,
     tradeOffers: [],
     alliances: [],
-    world: store,
+    // world: store, // Removed
   };
 };
 

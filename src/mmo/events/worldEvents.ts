@@ -138,7 +138,7 @@ export const EVENT_DEFINITIONS: Record<EventType, {
     description: 'Unpredictable system-wide volatility',
     baseDuration: 60000,
     severity: 'critical',
-    getModifiers: (severity) => ({
+    getModifiers: (_severity) => ({
       marketVolatility: 0.8,
       globalRevenueMultiplier: 0.7,
       productionMultiplier: 0.8,

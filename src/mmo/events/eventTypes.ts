@@ -148,7 +148,7 @@ export const MAJOR_EVENT_TEMPLATES: Record<string, {
     description: 'Government launches sweeping antitrust investigation into tech sector',
     severity: 'high',
     baseDuration: 180000, // 3 minutes
-    getEffects: (severity) => ({
+    getEffects: (_severity) => ({
       industryImpacts: {
         tech: {
           revenueMultiplier: 0.9,
@@ -174,7 +174,7 @@ export const MAJOR_EVENT_TEMPLATES: Record<string, {
     description: 'Catastrophic weather event disrupts global supply chains',
     severity: 'critical',
     baseDuration: 150000,
-    getEffects: (severity) => ({
+    getEffects: (_severity) => ({
       resourcePriceChanges: {
         grain: 150,
         steel: 80,
@@ -217,7 +217,7 @@ export const MAJOR_EVENT_TEMPLATES: Record<string, {
     description: 'Panic selling triggers massive market correction',
     severity: 'critical',
     baseDuration: 90000,
-    getEffects: (severity) => ({
+    getEffects: (_severity) => ({
       marketVolatility: 0.8,
       industryImpacts: {
         finance: {
@@ -250,7 +250,7 @@ export const MAJOR_EVENT_TEMPLATES: Record<string, {
     description: 'Massive data breach affects millions, reveals corporate negligence',
     severity: 'high',
     baseDuration: 120000,
-    getEffects: (severity) => ({
+    getEffects: (_severity) => ({
       industryImpacts: {
         tech: {
           revenueMultiplier: 0.95,
@@ -306,7 +306,7 @@ export const MAJOR_EVENT_TEMPLATES: Record<string, {
     description: 'Interest rates double across the board',
     severity: 'high',
     baseDuration: 180000,
-    getEffects: (severity) => ({
+    getEffects: (_severity) => ({
       interestRateChange: 2.0, // Double all debt interest
       assetEfficiencyChanges: {
         // No direct asset changes, but debt becomes expensive

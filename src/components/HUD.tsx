@@ -5,7 +5,7 @@ const HUD = () => {
   const { profile, accounts, calculateNetWorth } = useGameStore();
   const netWorth = calculateNetWorth();
   const checking = accounts.find(a => a.type === 'checking')?.balance || 0;
-  const savings = accounts.find(a => a.type === 'savings')?.balance || 0;
+  // const savings = accounts.find(a => a.type === 'savings')?.balance || 0; // Unused
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b-2 border-navy">

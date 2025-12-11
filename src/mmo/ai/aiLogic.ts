@@ -1,8 +1,8 @@
 // AI decision engine: Makes decisions based on personality and game state
 // Future: Can be extended with behavior trees, neural networks, etc.
 
-import { EnhancedAICompany, AIPersonality, AI_PERSONALITIES } from './competitors';
-import { randomFloat, randomBool } from '../utils/random';
+import { EnhancedAICompany, AI_PERSONALITIES } from './competitors';
+import { randomFloat } from '../utils/random';
 
 export type AIAction = 
   | 'expand_territory'
@@ -26,7 +26,7 @@ export interface AIDecision {
 // Calculate AI decision based on personality and game state
 export const calculateAIDecision = (
   ai: EnhancedAICompany,
-  playerCapital: number,
+  _playerCapital: number,
   playerPower: number,
   availableTerritories: number,
   marketConditions: 'BULL' | 'STABLE' | 'BEAR'

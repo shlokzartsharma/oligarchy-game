@@ -20,9 +20,9 @@ interface SabotageActionCardProps {
 const SabotageActionCard = ({ targetName, targetId, optionA, optionB }: SabotageActionCardProps) => {
   const { playerCompanyId, companies } = useMmoStore();
   const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
-  const world = useMmoStore.getState();
-  const canAffordA = player ? player.capital >= optionA.cost : false;
-  const canAffordB = player ? player.capital >= optionB.cost : false;
+  const world = useMmoStore.getState() as any;
+  const canAffordA = player ? (player.capital || player.cash) >= optionA.cost : false;
+  const canAffordB = player ? (player.capital || player.cash) >= optionB.cost : false;
   
   // Check cooldown
   const lastSabotage = (world as any).sabotageCooldowns?.[targetId] || 0;

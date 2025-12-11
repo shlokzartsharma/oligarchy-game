@@ -20,7 +20,7 @@ const CompanyDashboard = () => {
         >
           <div className="text-navy/70 text-sm">Capital</div>
           <div className="text-2xl font-bold text-soft-green">
-            ${player.capital.toLocaleString()}
+            ${(player.capital || player.cash).toLocaleString()}
           </div>
         </motion.div>
 
@@ -80,7 +80,7 @@ const CompanyDashboard = () => {
       >
         <h3 className="text-xl font-bold text-navy mb-4">Departments</h3>
         <div className="grid md:grid-cols-5 gap-4">
-          {Object.entries(player.departments).map(([dept, level]) => (
+          {Object.entries(player.departments || {}).map(([dept, level]) => (
             <div key={dept} className="p-3 bg-navy/5 rounded-lg text-center">
               <div className="font-semibold text-navy capitalize">{dept}</div>
               <div className="text-2xl font-bold text-gold">{level as number}</div>
@@ -98,12 +98,12 @@ const CompanyDashboard = () => {
       >
         <h3 className="text-xl font-bold text-navy mb-4">Resources</h3>
         <div className="grid md:grid-cols-4 gap-4">
-          {Object.keys(player.rawResources).length === 0 ? (
+          {Object.keys(player.rawResources || player.resources || {}).length === 0 ? (
             <div className="col-span-4 text-navy/50 text-center py-4">
               No resources stored
             </div>
           ) : (
-            Object.entries(player.rawResources).map(([type, amount]) => (
+            Object.entries(player.rawResources || player.resources || {}).map(([type, amount]) => (
               <div key={type} className="p-3 bg-navy/5 rounded-lg">
                 <div className="font-semibold text-navy capitalize">{type.replace('_', ' ')}</div>
                 <div className="text-lg font-bold text-navy">{(amount as number).toLocaleString()}</div>

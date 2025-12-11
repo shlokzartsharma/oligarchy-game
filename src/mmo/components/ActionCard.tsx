@@ -5,7 +5,9 @@ import { ActionCardData } from '../types';
 import { randomChoice } from '../utils/random';
 
 const ActionCard = () => {
-  const { player, world, aiCompanies, expandTerritory, undercutCompetitor, investInRD } = useMmoStore();
+  const { playerCompanyId, companies, aiCompanies, expandTerritory, undercutCompetitor, investInRD } = useMmoStore();
+  const player = playerCompanyId ? companies.find(c => c.id === playerCompanyId) : null;
+  const world = useMmoStore.getState() as any;
   const [currentAction, setCurrentAction] = useState<ActionCardData | null>(null);
   const [lastActionTime, setLastActionTime] = useState(Date.now());
 
@@ -13,24 +15,24 @@ const ActionCard = () => {
     if (!player) return;
 
     const generateAction = (): ActionCardData => {
-      const availableTerritories = world.territories.filter(
-        t => !t.owner || t.owner !== player.id
+      const availableTerritories = (world.territories || []).filter(
+        (t: any) => !t.owner || t.owner !== player.id
       );
-      const availableCompetitors = aiCompanies.filter(c => c.capital > 0);
+      const availableCompetitors = aiCompanies.filter(c => (c.capital || c.cash || 0) > 0);
 
       const actions: ActionCardData[] = [];
 
       // Expand territory action
       if (availableTerritories.length > 0) {
-        const territory = randomChoice(availableTerritories);
+        const territory = randomChoice(availableTerritories) as any;
         actions.push({
           id: 'expand',
           title: 'Territory Expansion Opportunity',
-          description: `A prime location has become available: ${territory.name}. Seize this opportunity to expand your influence.`,
+          description: `A prime location has become available: ${territory?.name || 'Unknown'}. Seize this opportunity to expand your influence.`,
           choiceA: {
             text: 'Expand Now',
             effect: () => {
-              expandTerritory(territory.id);
+              expandTerritory(territory?.id || '');
             },
           },
           choiceB: {
@@ -71,9 +73,9 @@ const ActionCard = () => {
         description: 'Invest in innovation to boost your revenue rate and gain a competitive edge.',
         choiceA: {
           text: 'Invest $50K',
-          effect: () => {
-            investInRD();
-          },
+            effect: () => {
+              investInRD(50000);
+            },
         },
         choiceB: {
           text: 'Save Capital',

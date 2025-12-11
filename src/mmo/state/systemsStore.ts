@@ -38,8 +38,8 @@ export const createSystemsState = (): SystemsState => {
 // Update all systems (called periodically)
 export const updateSystems = (
   state: SystemsState,
-  availableTerritories?: string[],
-  availableResources?: ResourceType[]
+  _availableTerritories?: string[],
+  _availableResources?: ResourceType[]
 ): SystemsState => {
   const now = Date.now();
 
