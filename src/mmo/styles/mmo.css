@@ -1,0 +1,20 @@
+/* MMO-specific styles */
+/* Additional styles can be added here if needed beyond Tailwind */
+
+.mmo-glass {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.mmo-card {
+  transition: all 0.3s ease;
+}
+
+.mmo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Future: Add multiplayer-specific animations and styles */
+
